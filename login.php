@@ -2,8 +2,18 @@
 
 include "./sanitize.php";
 include "./validate.php";
+//include "./encrypt.php";
 
 session_start();
+
+/*
+$e = new Encrypt();
+$iv_t_ct = $e->encrypt("Encrypt me");
+var_dump($iv_t_ct);
+
+$pt = $e->decrypt($iv_t_ct);
+var_dump($pt);
+*/
 
 //var_dump(is_username('mrr24'));
 

@@ -1,5 +1,6 @@
 <?php
 include_once("./secrets.php"); //path matters
+include_once("./encrypt.php");
 
 //DB connector class
 
@@ -9,9 +10,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 class Database{
+    
     private $server = "127.0.0.1";
     private $user = Secrets::DB_USER; //TODO: Least Priv. make new user.
-    private $password = DB_PASSWORD;
+    private $password = Secrets::DB_PASSWORD;
     //TODO: weak password, hardcoded
     private $schema = "web_app";
 
@@ -79,7 +81,14 @@ class Database{
         //split up ssn
         $ssn = str_replace("-", "", $ssn); //remove dashes
         $ssn_prefix = substr($ssn, 0, 5);
+
+        //encrypt asap
+        $e = new Encrypt();
+        $ssn_prefix_iv_t_ct = $e->encrypt($ssn_prefix);
+        
+
         $ssn_suffix = substr($ssn, 5);
+
 
         //var_dump($ssn);
         //var_dump($ssn_prefix);
@@ -89,7 +98,7 @@ class Database{
         $insert_sql = "INSERT INTO users (username, password, preferred, email, ssn_prefix, ssn_suffix) VALUES (?, ?, ?, ?, ?, ?)";
 
         //bind variables
-        $arr = [$un, $pw, $rn, '', $ssn_prefix, $ssn_suffix];
+        $arr = [$un, $pw, $rn, '', $ssn_prefix_iv_t_ct, $ssn_suffix];
 
         //execute
         if($this->conn->execute_query($insert_sql, $arr)){
